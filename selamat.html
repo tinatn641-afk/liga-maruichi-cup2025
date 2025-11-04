@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Selamat Bertanding | Liga Maruichi Cup</title>
+  <style>
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes sparkle {
+      0%, 100% { text-shadow: 0 0 8px #ffd6d6, 0 0 16px #ffaaaa; }
+      50% { text-shadow: 0 0 16px #ff6666, 0 0 30px #ff0000; }
+    }
+
+    body {
+      background: radial-gradient(circle at top, #fff0f0, #ffe5e5, #ffcccc);
+      color: #5a0f0f;
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      padding: 100px 20px;
+      overflow: hidden;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(90,15,15,0.2);
+      max-width: 520px;
+      margin: auto;
+      padding: 50px 30px;
+      animation: fadeInUp 1s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 15px;
+      color: #7a1717;
+      animation: sparkle 2s infinite alternate;
+    }
+
+    p {
+      font-size: 1.05rem;
+      margin-bottom: 40px;
+      line-height: 1.6;
+      color: #4b0000;
+    }
+
+    a {
+      display: inline-block;
+      background: linear-gradient(90deg, #b22222, #7a1717);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(90,15,15,0.3);
+      transition: all 0.3s ease;
+    }
+
+    a:hover {
+      background: linear-gradient(90deg, #7a1717, #5a0f0f);
+      transform: scale(1.05);
+    }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="card">
+    <h1>🏸 Selamat Bertanding!</h1>
+    <p>
+      Terima kasih telah mendaftar di <strong>Liga Maruichi Cup - Badminton</strong>!<br>
+      Tunjukkan sportivitas, semangat, dan kemampuan terbaikmu di lapangan! 💪
+    </p>
+    <a href="index.html">🏠 Kembali ke Halaman Utama</a>
+  </div>
+
+  <script>
+    // 🎉 Efek confetti sederhana
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let confettis = [];
+
+    const colors = ['#b22222', '#ff6666', '#ffd6d6', '#7a1717', '#ffaaaa'];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Confetti {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height - canvas.height;
+        this.size = Math.random() * 8 + 5;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.speed = Math.random() * 3 + 2;
+        this.tilt = Math.random() * 10 - 5;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.ellipse(this.x, this.y, this.size, this.size / 2, this.tilt, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+      update() {
+        this.y += this.speed;
+        this.x += Math.sin(this.tilt);
+        if (this.y > canvas.height) {
+          this.y = -10;
+          this.x = Math.random() * canvas.width;
+        }
+      }
+    }
+
+    function initConfetti() {
+      for (let i = 0; i < 150; i++) {
+        confettis.push(new Confetti());
+      }
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettis.forEach((c) => {
+        c.update();
+        c.draw();
+      });
+      requestAnimationFrame(animateConfetti);
+    }
+
+    initConfetti();
+    animateConfetti();
+  </script>
+</body>
+</html>

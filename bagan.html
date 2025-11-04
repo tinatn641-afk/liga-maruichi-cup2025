@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bagan Pertandingan | Liga Maruichi Cup</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fff4f4, #ffecec);
+      color: #5a0f0f;
+      text-align: center;
+      padding: 30px 10px;
+    }
+    h1 {
+      color: #7a1717;
+      margin-bottom: 20px;
+    }
+    .round {
+      display: inline-block;
+      vertical-align: top;
+      margin: 0 25px;
+    }
+    .round h2 {
+      color: #7a1717;
+      margin-bottom: 10px;
+    }
+    .match {
+      background: #fff;
+      border: 2px solid #7a1717;
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 20px;
+      width: 220px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .match:hover {
+      transform: scale(1.05);
+    }
+    .match .team {
+      padding: 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin: 4px 0;
+    }
+    .winner {
+      background: #7a1717;
+      color: #fff;
+    }
+    .vs {
+      color: #7a1717;
+      font-weight: bold;
+      margin: 6px 0;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 18px;
+      background: #7a1717;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    button:hover {
+      background: #5a0f0f;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏸 Bagan Pertandingan - Liga Maruichi Cup</h1>
+  <div id="bracket"></div>
+  <button onclick="resetBracket()">🔁 Ulangi Turnamen</button>
+
+  <script>
+  function generateBracket() {
+    const data = JSON.parse(localStorage.getItem("pendaftarBadminton") || "[]");
+    const bracketDiv = document.getElementById("bracket");
+    bracketDiv.innerHTML = "";
+
+    if (data.length < 2) {
+      bracketDiv.innerHTML = "<p>Minimal 2 tim untuk membuat bagan.</p>";
+      return;
+    }
+
+    // Acak tim
+    const shuffled = data.sort(() => Math.random() - 0.5);
+    let round = 1;
+    let currentRound = shuffled.map(t => t.team);
+
+    while (currentRound.length > 1) {
+      const nextRound = [];
+      const roundDiv = document.createElement("div");
+      roundDiv.classList.add("round");
+      roundDiv.innerHTML = `<h2>Round ${round}</h2>`;
+
+      for (let i = 0; i < currentRound.length; i += 2) {
+        const team1 = currentRound[i] || "BYE";
+        const team2 = currentRound[i + 1] || "BYE";
+
+        const matchDiv = document.createElement("div");
+        matchDiv.classList.add("match");
+        matchDiv.innerHTML = `
+          <div class="team">${team1}</div>
+          <div class="vs">VS</div>
+          <div class="team">${team2}</div>
+        `;
+
+        matchDiv.querySelectorAll(".team").forEach(el => {
+          el.addEventListener("click", () => {
+            // reset warna
+            matchDiv.querySelectorAll(".team").forEach(t => t.classList.remove("winner"));
+            el.classList.add("winner");
+            const winner = el.textContent;
+            matchDiv.dataset.winner = winner;
+            matchDiv.style.background = "#fffafc";
+            updateNextRound();
+          });
+        });
+
+        roundDiv.appendChild(matchDiv);
+      }
+
+      bracketDiv.appendChild(roundDiv);
+      round++;
+      currentRound = new Array(Math.ceil(currentRound.length / 2)).fill(null);
+    }
+
+    const finalDiv = document.createElement("div");
+    finalDiv.classList.add("round");
+    finalDiv.innerHTML = `<h2>🏆 Final</h2><div id="final"></div>`;
+    bracketDiv.appendChild(finalDiv);
+  }
+
+  function updateNextRound() {
+    const allRounds = document.querySelectorAll(".round");
+    for (let i = 0; i < allRounds.length - 1; i++) {
+      const currentMatches = allRounds[i].querySelectorAll(".match");
+      const nextRoundDiv = allRounds[i + 1];
+      const nextContainer = nextRoundDiv.querySelector("#final") || nextRoundDiv;
+
+      const winners = [];
+      currentMatches.forEach(match => {
+        if (match.dataset.winner) winners.push(match.dataset.winner);
+      });
+
+      // Kalau babak sudah lengkap pilihannya, isi babak berikutnya
+      if (winners.length * 2 === currentMatches.length * 2 || i === allRounds.length - 2) {
+        nextContainer.innerHTML = "";
+        for (let j = 0; j < winners.length; j += 2) {
+          const team1 = winners[j] || "BYE";
+          const team2 = winners[j + 1] || "BYE";
+
+          const matchDiv = document.createElement("div");
+          matchDiv.classList.add("match");
+          matchDiv.innerHTML = `
+            <div class="team">${team1}</div>
+            <div class="vs">VS</div>
+            <div class="team">${team2}</div>
+          `;
+
+          matchDiv.querySelectorAll(".team").forEach(el => {
+            el.addEventListener("click", () => {
+              matchDiv.querySelectorAll(".team").forEach(t => t.classList.remove("winner"));
+              el.classList.add("winner");
+              const winner = el.textContent;
+              matchDiv.dataset.winner = winner;
+              matchDiv.style.background = "#fffafc";
+              if (nextContainer.id === "final") {
+                document.getElementById("bracket").insertAdjacentHTML(
+                  "beforeend",
+                  `<h2 style='color:#7a1717;'>🏆 JUARA: ${winner}</h2>`
+                );
+              }
+            });
+          });
+
+          nextContainer.appendChild(matchDiv);
+        }
+      }
+    }
+  }
+
+  function resetBracket() {
+    document.getElementById("bracket").innerHTML = "";
+    generateBracket();
+  }
+
+  generateBracket();
+  </script>
+</body>
+</html>
