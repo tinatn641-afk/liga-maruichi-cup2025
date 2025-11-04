@@ -16,6 +16,11 @@
       color: #5a0f0f;
       margin-bottom: 20px;
     }
+    .top-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -41,25 +46,21 @@
       color: #888;
       margin-top: 30px;
     }
-    .btn-clear, .btn-edit, .btn-delete {
+    .btn {
       display: inline-block;
       border: none;
-      padding: 6px 10px;
+      padding: 8px 14px;
       border-radius: 6px;
       cursor: pointer;
       color: #fff;
       font-size: 13px;
+      transition: background 0.2s;
     }
-    .btn-clear {
-      background: #b22222;
-      margin-bottom: 10px;
-    }
-    .btn-edit {
-      background: #0d6efd;
-    }
-    .btn-delete {
-      background: #dc3545;
-    }
+    .btn-clear { background: #b22222; }
+    .btn-back { background: #6c757d; }
+    .btn-edit { background: #0d6efd; }
+    .btn-delete { background: #dc3545; }
+    .btn:hover { opacity: 0.9; }
     img.bukti {
       width: 70px;
       height: 70px;
@@ -77,7 +78,12 @@
 </head>
 <body>
   <h1>📋 Dashboard Admin - Badminton</h1>
-  <button class="btn-clear" onclick="clearData()">🗑️ Hapus Semua Data</button>
+
+  <div class="top-buttons">
+    <button class="btn btn-back" onclick="goBack()">⬅️ Kembali</button>
+    <button class="btn btn-clear" onclick="clearData()">🗑️ Hapus Semua Data</button>
+  </div>
+
   <table id="table-pendaftar">
     <thead>
       <tr>
@@ -122,8 +128,8 @@
               : 'Belum Upload'}</td>
           <td>${item.date}</td>
           <td>
-            <button class="btn-edit" onclick="editData(${index})">✏️ Edit</button>
-            <button class="btn-delete" onclick="deleteData(${index})">🗑️ Hapus</button>
+            <button class="btn btn-edit" onclick="editData(${index})">✏️ Edit</button>
+            <button class="btn btn-delete" onclick="deleteData(${index})">🗑️ Hapus</button>
           </td>
         </tr>
       `;
@@ -169,6 +175,11 @@
       localStorage.removeItem("pendaftarBadminton");
       loadData();
     }
+  }
+
+  function goBack(){
+    // Ganti "pendaftaran.html" ke halaman tujuanmu
+    window.location.href = "index.html";
   }
 
   loadData();
