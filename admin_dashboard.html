@@ -19,6 +19,8 @@
     .top-buttons {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap; /* agar responsif */
+      gap: 10px;
       margin-bottom: 15px;
     }
     table {
@@ -60,6 +62,7 @@
     .btn-back { background: #6c757d; }
     .btn-edit { background: #0d6efd; }
     .btn-delete { background: #dc3545; }
+    .btn-download { background: #198754; } /* ➕ Tambahan: warna hijau */
     .btn:hover { opacity: 0.9; }
     img.bukti {
       width: 70px;
@@ -82,6 +85,7 @@
   <div class="top-buttons">
     <button class="btn btn-back" onclick="goBack()">⬅️ Kembali</button>
     <button class="btn btn-clear" onclick="clearData()">🗑️ Hapus Semua Data</button>
+    <button class="btn btn-download" onclick="downloadExcel()">⬇️ Download Excel</button> <!-- ➕ Tambahan -->
   </div>
 
   <table id="table-pendaftar">
@@ -178,8 +182,30 @@
   }
 
   function goBack(){
-    // Ganti "pendaftaran.html" ke halaman tujuanmu
     window.location.href = "index.html";
+  }
+
+  // ➕ Tambahan: Fungsi download Excel
+  function downloadExcel(){
+    const data = JSON.parse(localStorage.getItem("pendaftarBadminton") || "[]");
+    if(data.length === 0){
+      alert("Belum ada data untuk didownload!");
+      return;
+    }
+
+    let csv = "No,Nama Tim,Departement,Pemain 1 (NIK),Pemain 2 (NIK),Tanggal Daftar\n";
+    data.forEach((item, i) => {
+      csv += `${i+1},"${item.team}","${item.departement}","${item.player1.name} (${item.player1.nik})","${item.player2.name} (${item.player2.nik})","${item.date}"\n`;
+    });
+
+    // Buat blob file Excel (format CSV)
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Data_Pendaftar_Badminton.csv"; // nama file
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   loadData();
