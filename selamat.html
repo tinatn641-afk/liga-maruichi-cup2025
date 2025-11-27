@@ -86,13 +86,6 @@
       Tunjukkan sportivitas, semangat, dan kemampuan terbaikmu di lapangan! 💪
     </p>
     <a href="bagan.html">Lihat Bagan</a>
-<br><br>
-
-<a href="index.html">⬅ Kembali ke Dashboard</a>
-<br><br>
-
-<a href="badminton.html">🔄 Kembali Mendaftar</a>
-
   </div>
 
   <script>
@@ -110,35 +103,48 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    const shuttleImg = new Image();
-shuttleImg.src = "kok.png"; // gambar kok dari folder img
-
-class Confetti {
-  constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height - canvas.height;
-    this.size = Math.random() * 40 + 20; // ukuran shuttlecock jatuh
-    this.speed = Math.random() * 3 + 1.5;
-    this.rotate = Math.random() * 360;
-    this.rotateSpeed = Math.random() * 2 - 1;
-  }
-  draw() {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate((this.rotate * Math.PI) / 180);
-    ctx.drawImage(shuttleImg, -this.size / 2, -this.size / 2, this.size, this.size);
-    ctx.restore();
-  }
-  update() {
-    this.y += this.speed;
-    this.rotate += this.rotateSpeed;
-    if (this.y > canvas.height + 50) {
-      this.y = -50;
-      this.x = Math.random() * canvas.width;
+    class Confetti {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height - canvas.height;
+        this.size = Math.random() * 8 + 5;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.speed = Math.random() * 3 + 2;
+        this.tilt = Math.random() * 10 - 5;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.ellipse(this.x, this.y, this.size, this.size / 2, this.tilt, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+      update() {
+        this.y += this.speed;
+        this.x += Math.sin(this.tilt);
+        if (this.y > canvas.height) {
+          this.y = -10;
+          this.x = Math.random() * canvas.width;
+        }
+      }
     }
-  }
-}
 
+    function initConfetti() {
+      for (let i = 0; i < 150; i++) {
+        confettis.push(new Confetti());
+      }
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettis.forEach((c) => {
+        c.update();
+        c.draw();
+      });
+      requestAnimationFrame(animateConfetti);
+    }
+
+    initConfetti();
+    animateConfetti();
   </script>
 </body>
 </html>
